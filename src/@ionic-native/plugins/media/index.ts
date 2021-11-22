@@ -14,12 +14,17 @@ export class MediaObject {
   /**
    * An observable that notifies you when an error occurs
    */
-  onError: Observable<MEDIA_ERROR>;
+  onError: Observable<MediaError>;
 
   /**
    * An observable that notifies you when the file status changes
    */
   onStatusUpdate: Observable<MEDIA_STATUS>;
+
+  /**
+   * An observable that notifies you when the file status changes
+   */
+  onInfoUpdate: Observable<MEDIA_INFO>;
 
   /**
    * @hidden
@@ -36,13 +41,18 @@ export class MediaObject {
    */
   @InstanceProperty() statusCallback: Function;
 
+  /**
+   * @hidden
+   */
+  @InstanceProperty() infoCallback: Function;
+
   constructor(private _objectInstance: any) {
     this.onSuccess = new Observable<any>((observer: Observer<any>) => {
       this.successCallback = observer.next.bind(observer);
       return () => (this.successCallback = () => {});
     });
 
-    this.onError = new Observable<MEDIA_ERROR>((observer: Observer<MEDIA_ERROR>) => {
+    this.onError = new Observable<MediaError>((observer: Observer<MediaError>) => {
       this.errorCallback = observer.next.bind(observer);
       return () => (this.errorCallback = () => {});
     });
@@ -50,6 +60,11 @@ export class MediaObject {
     this.onStatusUpdate = new Observable<MEDIA_STATUS>((observer: Observer<MEDIA_STATUS>) => {
       this.statusCallback = observer.next.bind(observer);
       return () => (this.statusCallback = () => {});
+    });
+
+    this.onInfoUpdate = new Observable<MEDIA_INFO>((observer: Observer<MEDIA_INFO>) => {
+      this.infoCallback = observer.next.bind(observer);
+      return () => (this.infoCallback = () => {});
     });
   }
 
@@ -85,6 +100,12 @@ export class MediaObject {
    */
   @CordovaInstance({ sync: true })
   play(iosOptions?: { numberOfLoops?: number; playAudioWhenScreenIsLocked?: boolean }): void {}
+
+  /**
+   * Start or resume playing audio file in a background thread.
+   */
+  @CordovaInstance({ sync: true })
+  playInBackground(iosOptions?: { numberOfLoops?: number; playAudioWhenScreenIsLocked?: boolean }): void {}
 
   /**
    * Pauses playing an audio file.
@@ -168,6 +189,11 @@ export enum MEDIA_STATUS {
   STOPPED,
 }
 
+export enum MEDIA_INFO {
+  BUFFERING_START = 0,
+  BUFFERING_END,
+}
+
 export enum MEDIA_ERROR {
   ABORTED = 1,
   NETWORK,
@@ -202,6 +228,8 @@ export type MediaErrorCallback = (error: MediaError) => void;
  * // to listen to plugin events:
  *
  * file.onStatusUpdate.subscribe(status => console.log(status)); // fires when file status changes
+ *
+ * file.onInfoUpdate.subscribe(status => console.log(status)); // fires when playback buffer status changes
  *
  * file.onSuccess.subscribe(() => console.log('Action is successful'));
  *
