@@ -294,7 +294,7 @@ export interface ILocalNotification {
    * Uri of the file containing the sound to play when an alert is displayed
    * Default: res://platform_default
    */
-  sound?: string;
+  sound?: string | boolean;
 
   /**
    * Arbitrary data, objects will be encoded to JSON string
@@ -328,6 +328,30 @@ export interface ILocalNotification {
    * Use the default notification vibrate.
    */
   vibrate?: boolean;
+
+  /**
+   * ANDROID ONLY
+   * If set to true, will use fullScreenIntent in AlarmManager to launch application.
+   */
+  fullScreenIntent?: boolean;
+
+  /**
+   * ANDROID ONLY
+   * Notification launches application if closed (Android <= 9).
+   */
+  autoLaunch?: boolean;
+
+  /**
+   * ANDROID ONLY
+   * If passed in, a notification channel will be created (using volume and vibration settings to determine importance)
+   */
+  channelId?: number;
+
+  /**
+   * ANDROID ONLY
+   * Name of the notification channel to use
+   */
+  channelName?: string;
 
   /**
    * ANDROID ONLY
